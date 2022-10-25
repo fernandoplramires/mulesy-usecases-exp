@@ -6,8 +6,10 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
-    <global-property doc:name="Global Property" doc:id="ed44836e-e45d-447f-898a-06d3d57722ec" name="databaseDirectory" value='src/main/resources/virtualDisk/' />
-    <file:config name="File_Config" doc:name="File Config" doc:id="885b36e5-13f0-4e90-870d-0c5dd4e005f5" />
+    <global-property doc:name="Global Property" doc:id="ed44836e-e45d-447f-898a-06d3d57722ec" name="databaseDirectory" value='${mule.home}/apps/${app.name}/' />
+    <file:config name="File_Config" doc:name="File Config" doc:id="885b36e5-13f0-4e90-870d-0c5dd4e005f5" >
+		<file:connection workingDir="${mule.home}/apps/" />
+	</file:config>
 	<flow name="post-images-system" doc:id="56edde84-f274-4399-b98c-ddf92600c978" >
 		<set-variable value="#[payload.imageName]" doc:name="Image Name" doc:id="8ba7ea66-a32c-40f1-935b-981fdf66a9da" variableName="imageNameToSave"/>
 		<ee:transform doc:name="Convert Base64 to Binary" doc:id="fcd2f72b-c16a-4bdb-b995-2bad97ff6302" >
@@ -25,12 +27,15 @@ dw::core::Binaries::fromBase64(payload.imageRequestData.base64String)]]></ee:set
             	<compression:zip-archiver />
         	</compression:archiver>
         </compression:archive>
-		<file:write doc:name="ZIP to Disk" doc:id="4534588b-673d-4cbb-a2d3-3133e408a286" config-ref="File_Config" path='#[(Mule::p("databaseDirectory") ++ vars.imageNameToSave ++ ".zip")]'>
+		<set-variable value='#[(Mule::p("databaseDirectory") ++ vars.imageNameToSave ++ ".zip")]' doc:name="ZIP Filename with path" doc:id="4d8c505d-1630-477f-8942-740b4847a99a" variableName="zipFileNameWithPath"/>
+		<logger level="INFO" doc:name="(INFO) Zip Filename with Path" doc:id="50e6d1e5-af58-4627-be87-2a6e4ef1f233" message='Write file: #[vars.zipFileNameWithPath]' />
+		<file:write doc:name="ZIP to Disk" doc:id="4534588b-673d-4cbb-a2d3-3133e408a286" config-ref="File_Config" path='#[vars.zipFileNameWithPath]'>
 		</file:write>
 	</flow>
 	
 	<flow name="get-images-by-image-filename-system" doc:id="2237a8a9-9068-4f5f-932d-34f053dd6478" >
 		<set-variable value='#[Mule::p("databaseDirectory") ++ payload.imageFilenameToRead ++ ".zip"]' doc:name="Image Name" doc:id="8fa838fc-4e04-4ee9-b86b-f4f5a23db8ca" variableName="imageFilenameToRead"/>
+		<logger level="INFO" doc:name="(INFO) Zip Filename with Path" doc:id="84d805f7-570f-44bf-b53d-fd534dbd68e2" message="Read file: #[vars.imageFilenameToRead]" />
 		<file:read doc:name="Image ZIP" doc:id="a254e193-859f-4449-8a28-c71f65ad815a" config-ref="File_Config" path='#[vars.imageFilenameToRead]'/>
 		<compression:extract doc:name="ZIP to Payload" doc:id="bd9ea73e-399d-4684-b45a-7b4f2746e82e" >
 			<compression:extractor >
