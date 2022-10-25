@@ -21,11 +21,11 @@
 					}
 				},
 				"url": {
-					"raw": "http://mulesy-usecases-exp.us-e1.cloudhub.io/api/images?storeInDatabase=false",
+					"raw": "http://mulesy-usecases-exp.br-s1.cloudhub.io/api/images?storeInDatabase=false",
 					"protocol": "http",
 					"host": [
 						"mulesy-usecases-exp",
-						"us-e1",
+						"br-s1",
 						"cloudhub",
 						"io"
 					],
@@ -58,11 +58,11 @@
 					}
 				},
 				"url": {
-					"raw": "http://mulesy-usecases-exp.us-e1.cloudhub.io/api/images?storeInDatabase=true",
+					"raw": "http://mulesy-usecases-exp.br-s1.cloudhub.io/api/images?storeInDatabase=true",
 					"protocol": "http",
 					"host": [
 						"mulesy-usecases-exp",
-						"us-e1",
+						"br-s1",
 						"cloudhub",
 						"io"
 					],
@@ -86,11 +86,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://mulesy-usecases-exp.us-e1.cloudhub.io/api/images/image_not_exist",
+					"raw": "http://mulesy-usecases-exp.br-s1.cloudhub.io/api/images/image_not_exist",
 					"protocol": "http",
 					"host": [
 						"mulesy-usecases-exp",
-						"us-e1",
+						"br-s1",
 						"cloudhub",
 						"io"
 					],
@@ -109,18 +109,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://mulesy-usecases-exp.us-e1.cloudhub.io/api/images/xxx",
+					"raw": "http://mulesy-usecases-exp.br-s1.cloudhub.io/api/images/image_XXX",
 					"protocol": "http",
 					"host": [
 						"mulesy-usecases-exp",
-						"us-e1",
+						"br-s1",
 						"cloudhub",
 						"io"
 					],
 					"path": [
 						"api",
 						"images",
-						"xxx"
+						"image_XXX"
 					]
 				}
 			},
