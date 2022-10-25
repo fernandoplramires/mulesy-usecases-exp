@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+    <global-property doc:name="Global Property" doc:id="ed44836e-e45d-447f-898a-06d3d57722ec" name="databaseDirectory" value='src/main/resources/virtualDisk/' />
+    <file:config name="File_Config" doc:name="File Config" doc:id="885b36e5-13f0-4e90-870d-0c5dd4e005f5" />
+	<flow name="post-images-system" doc:id="56edde84-f274-4399-b98c-ddf92600c978" >
+		<set-variable value="#[payload.imageName]" doc:name="Image Name" doc:id="8ba7ea66-a32c-40f1-935b-981fdf66a9da" variableName="imageNameToSave"/>
+		<ee:transform doc:name="Convert Base64 to Binary" doc:id="fcd2f72b-c16a-4bdb-b995-2bad97ff6302" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/octet-stream
+---
+dw::core::Binaries::fromBase64(payload.imageRequestData.base64String)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload]" doc:name="Mime Type to Image/PNG" doc:id="38ad1e3d-4e9d-4cc8-b93f-8ae2e08c69e8" mimeType="image/png" />
+		<compression:archive doc:name="Image to ZIP" doc:id="678fddd5-b618-46c0-8282-2ea7b3193a09">
+            <compression:entries><![CDATA[#[{ (vars.imageNameToSave ++ ".png"): payload }]]]></compression:entries>
+            <compression:archiver>
+            	<compression:zip-archiver />
+        	</compression:archiver>
+        </compression:archive>
+		<file:write doc:name="ZIP to Disk" doc:id="4534588b-673d-4cbb-a2d3-3133e408a286" config-ref="File_Config" path='#[(Mule::p("databaseDirectory") ++ vars.imageNameToSave ++ ".zip")]'>
+		</file:write>
+	</flow>
+	
+	<flow name="get-images-by-image-filename-system" doc:id="2237a8a9-9068-4f5f-932d-34f053dd6478" >
+		<set-variable value='#[Mule::p("databaseDirectory") ++ payload.imageFilenameToRead ++ ".zip"]' doc:name="Image Name" doc:id="8fa838fc-4e04-4ee9-b86b-f4f5a23db8ca" variableName="imageFilenameToRead"/>
+		<file:read doc:name="Image ZIP" doc:id="a254e193-859f-4449-8a28-c71f65ad815a" config-ref="File_Config" path='#[vars.imageFilenameToRead]'/>
+		<compression:extract doc:name="ZIP to Payload" doc:id="bd9ea73e-399d-4684-b45a-7b4f2746e82e" >
+			<compression:extractor >
+				<compression:zip-extractor />
+			</compression:extractor>
+		</compression:extract>
+		<ee:transform doc:name="Recovery image values" doc:id="ecb7e825-019b-4d54-a5bf-1845ad59e016" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload mapObject {
+  fileName: '$$',
+  fileContent: $
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload.fileContent]" doc:name="Mime Type to Image/PNG" doc:id="f4d885b7-1356-45de-b224-b22e77669fd8" mimeType="image/png" />
+	</flow>
+</mule>

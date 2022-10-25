@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_8d05cb5a_2095_431e_9724_0a236ac547fe_Output_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {| imageFileName: String |}, 
+  version: String, 
+  localAddress: String
+|}
+

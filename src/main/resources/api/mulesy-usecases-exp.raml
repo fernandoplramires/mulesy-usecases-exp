@@ -1,0 +1,45 @@
+#%RAML 1.0
+version: v1
+title: mulesy-usecases-exp
+description: Mulesy UseCases Experience
+protocols: [HTTP]
+
+types:
+  Text:
+   type: file
+   fileTypes: ['text/plain'] 
+  Image:
+    type: file
+    fileTypes: ['image/png']
+  Binary:
+    type: file
+    fileTypes: ['application/octet-stream']
+  File: Image | Binary
+
+/images:
+  post:
+    description: Store Image.
+    queryParameters:
+      storeInDatabase:
+        description: Do you like do store the image?
+        required: true
+        type: boolean
+        default: false
+    body:
+      application/json:
+        properties:
+          base64String:
+            description: Image file on format base64
+            required: true
+            type: File
+    responses:
+      "201":
+      "400":
+      "500":
+  /{imageFileName}:
+    get:
+      description: Get Image stored from database
+      responses:
+       "200":
+       "404":
+       "500":

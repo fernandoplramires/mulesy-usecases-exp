@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_2237a8a9_9068_4f5f_932d_34f053dd6478_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {| imageFileName: String |}, 
+  version: String, 
+  localAddress: String
+|}
+
