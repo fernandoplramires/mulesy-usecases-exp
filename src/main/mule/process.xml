@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:compression="http://www.mulesoft.org/schema/mule/compression" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+	<flow name="post-images-process" doc:id="2ffe7c77-4c2c-4c0b-8f11-0a52fd37c37b">
+		<set-variable value="#[payload.isImageToSaveInDatabase]" doc:name="(Flag) Store in Database" doc:id="065ee3eb-14ea-471d-845b-52b479a27d4f" variableName="isStoreInDatabase"/>
+		<choice doc:name="Store in Database?" doc:id="31dcbeb4-b849-48b3-99fc-decd7e9a1a6b">
+            <when expression='#[vars.isStoreInDatabase == "true"]'>
+				<flow-ref doc:name="System Layer" doc:id="50674a70-2b5c-4ade-b7b2-192445139083" name="post-images-system" target="systemLayerResponse"/>        
+			</when>
+			<otherwise>
+                <logger level="INFO" doc:name="Not store in the database" doc:id="32865c67-393a-4e98-84f7-0874d24e76af" message="[Optional] Flag to store in the database is false" />
+			</otherwise>
+        </choice>
+		<ee:transform doc:name="Convert Base64 to Binary" doc:id="96cd2d23-ef7c-49ce-b63f-b059a7706883">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/octet-stream
+---
+dw::core::Binaries::fromBase64(payload.imageRequestData.base64String)]]></ee:set-payload>
+            </ee:message>
+        	</ee:transform>
+		<set-payload value="#[payload]" doc:name="Mime Type to Image/PNG" doc:id="bea22126-29f1-4c9a-b954-5a6dc65b597f" mimeType="image/png" />
+	
+</flow>
+	<flow name="get-images-by-image-filename-process" doc:id="8d05cb5a-2095-431e-9724-0a236ac547fe" >
+		<flow-ref doc:name="System Layer" doc:id="dc20debf-0cad-430e-913f-d3b00659acb3" name="get-images-by-image-filename-system"/>
+	</flow>
+</mule>

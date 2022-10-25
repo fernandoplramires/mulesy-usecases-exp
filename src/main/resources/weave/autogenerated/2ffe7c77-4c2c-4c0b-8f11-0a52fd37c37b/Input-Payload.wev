@@ -1,0 +1,7 @@
+%dw 2.0
+
+type auto_2ffe7c77_4c2c_4c0b_8f11_0a52fd37c37b_Input_Payload = {
+  base64String: String | String, 
+  _?: Any
+}
+
