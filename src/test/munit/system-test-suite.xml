@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<munit:config name="system-test-suite.xml" />
+	
+	<global-property doc:name="Global Property" doc:id="c1d99f73-66bc-4ac4-bc7c-91498ba3eb20" name="databaseDirectory" value="${munit.temporary.directory}/" />
+	
+	<file:config name="MUnit_File_Config" doc:name="File Config" doc:id="bc73eb04-f8d3-4e5a-a05a-2a82cc4af7f9" >
+		<file:connection workingDir="${munit.temporary.directory}" />
+	</file:config>
+	<munit:test name="system-test-suite-post-images-systemTest" doc:id="4912637c-19d8-4fea-8abb-e90c14ff1bae" description="Test">
+		<munit:behavior >
+			<set-variable value='#["munit_image_mock"]' doc:name="Image Filename" doc:id="438b3b04-67f7-4ac7-8e7e-41aa3ea81035" variableName="imageFileName"/>
+			<set-variable value="#[MunitTools::getResourceAsString('mocks/image.base64')]" doc:name="Image Mock" doc:id="c1e15458-738f-46a4-ae39-68c134a13af2" variableName="imageMock" />
+			<ee:transform doc:name="Payload Request" doc:id="a60543f2-d179-4861-82be-b217e81857b1" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"imageName": vars.imageFileName,
+	"imageRequestData": {
+		"base64String": vars.imageMock
+	}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Post Images System" doc:id="ad08f143-efdc-4305-838c-7108de178820" name="post-images-system"/>
+		</munit:execution>
+		<munit:validation >
+			<file:list doc:name="ZIP File" doc:id="a1db0b48-9c67-4d14-8de9-fc7b13e3dddc" config-ref="MUnit_File_Config" directoryPath='#[Mule::p("databaseDirectory")]' recursive="true">
+				<file:matcher filenamePattern="munit_image_mock.zip" symLinks="EXCLUDE" />
+			</file:list>
+			<munit-tools:assert-equals doc:name="Filename found in the list operation" doc:id="78a216f6-179d-44c2-93e6-9a8e7205a29b" actual="#[payload[0].attributes.fileName]" expected='#[vars.imageFileName ++ ".zip"]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:before-test name="system-test-suiteBefore_Test" doc:id="2b53bf4a-b8c8-4445-a975-35ccee70dd2d">
+		<set-variable value='#["munit_image_mock"]' doc:name="Image Filename" doc:id="bbd9d8b5-e545-4065-b1ee-b0c6edcd3f20" variableName="imageFileName" />
+		<set-variable value="#[MunitTools::getResourceAsString('mocks/image.base64')]" doc:name="Image Mock" doc:id="37c123dd-9a15-4980-aaee-aaebb9d8bae4" variableName="imageMock" />
+		<ee:transform doc:name="Payload Request" doc:id="c93dec59-b7cc-4ac7-b516-f58df5a44f51">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"imageName": vars.imageFileName,
+	"imageRequestData": {
+		"base64String": vars.imageMock
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Post Images System" doc:id="e0826068-66b5-449c-bcf3-ee72d2515dc1" name="post-images-system" />
+	</munit:before-test>
+	<munit:test name="system-test-suite-get-images-by-image-filename-systemTest" doc:id="3d601863-3e52-49f3-af7e-da324902e40d" description="Test">
+		<munit:behavior >
+			<set-variable value='#["munit_image_mock"]' doc:name="Image Filename" doc:id="5ad3f6b4-8758-4d94-b17f-0bc53c9199a8" variableName="imageFileName" />
+			<ee:transform doc:name="Payload Request" doc:id="64399eb9-a470-4437-826c-fa99d3ac055b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"imageFilenameToRead": vars.imageFileName
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Get Images by Filename System" doc:id="755dc7ec-54f2-42db-b7d2-a76fc74224d8" name="get-images-by-image-filename-system" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Payload Media Type" doc:id="9fe9856e-0181-4586-8e58-88fcc268c277" actual="#[payload.^mediaType]" expected='#["image/png"]'/>
+		</munit:validation>
+	</munit:test>
+</mule>
