@@ -4,20 +4,16 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
     <!-- api-gateway:autodiscovery apiId="18257487" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="6cc96c20-5712-4edf-9eb2-2f162ef62364" flowRef="mulesy-usecases-exp-main" /-->
     
-    <http:listener-config name="mulesy-usecases-exp-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
-    </http:listener-config>
-    
     <apikit:config name="mulesy-usecases-exp-config" api="mulesy-usecases-exp.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
 	
 	<flow name="mulesy-usecases-exp-main">
-        <http:listener config-ref="mulesy-usecases-exp-httpListenerConfig" path="/api/*">
+        <http:listener config-ref="domain_httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:router config-ref="mulesy-usecases-exp-config" />
@@ -116,13 +112,13 @@ output application/json
         </error-handler>
     </flow>
     <flow name="mulesy-usecases-exp-console">
-        <http:listener config-ref="mulesy-usecases-exp-httpListenerConfig" path="/console/*">
+        <http:listener config-ref="domain_httpListenerConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:console config-ref="mulesy-usecases-exp-config" />
