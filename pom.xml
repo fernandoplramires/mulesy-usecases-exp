@@ -107,6 +107,12 @@
 			<version>1.0.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>52fb07f6-52db-485b-beb8-b9238737413b</groupId>
+			<artifactId>mulesy-usecases-common-flows</artifactId>
+			<version>1.0.0</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -120,6 +126,12 @@
 			<id>mulesoft-releases</id>
 			<name>MuleSoft Releases Repository</name>
 			<url>https://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>cognizant</id>
+			<name>Cognizant Robosh Corporate Repository</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v1/organizations/52fb07f6-52db-485b-beb8-b9238737413b/maven</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>

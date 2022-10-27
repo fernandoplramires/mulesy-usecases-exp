@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_d60ffbb1_2559_4d7c_8354_5adbe851d642_Output_Variables_imageNameToSave = Any
+

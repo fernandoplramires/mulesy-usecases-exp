@@ -1,26 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+	xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+						http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+						http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+						http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+    <import doc:name="Import" doc:id="e9d18769-8b82-414b-8677-c58d12fb3866" file="conversions.xml" />
     <global-property doc:name="Global Property" doc:id="ed44836e-e45d-447f-898a-06d3d57722ec" name="databaseDirectory" value='${mule.home}/apps/${app.name}/' />
     <file:config name="File_Config" doc:name="File Config" doc:id="885b36e5-13f0-4e90-870d-0c5dd4e005f5" >
 		<file:connection workingDir="${mule.home}/apps/" />
 	</file:config>
 	<flow name="post-images-system" doc:id="56edde84-f274-4399-b98c-ddf92600c978" >
 		<set-variable value="#[payload.imageName]" doc:name="Image Name" doc:id="8ba7ea66-a32c-40f1-935b-981fdf66a9da" variableName="imageNameToSave"/>
-		<ee:transform doc:name="Convert Base64 to Binary" doc:id="fcd2f72b-c16a-4bdb-b995-2bad97ff6302" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/octet-stream
----
-dw::core::Binaries::fromBase64(payload.imageRequestData.base64String)]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<set-payload value="#[payload]" doc:name="Mime Type to Image/PNG" doc:id="38ad1e3d-4e9d-4cc8-b93f-8ae2e08c69e8" mimeType="image/png" />
+		<flow-ref doc:name="(Common Flows) Convert Base64 to Image/PNG" doc:id="d6e3eb1d-f5ad-487d-8ab5-fa855a192300" name="convert-base64-to-image-png-flow"/>
 		<compression:archive doc:name="Image to ZIP" doc:id="678fddd5-b618-46c0-8282-2ea7b3193a09">
             <compression:entries><![CDATA[#[{ (vars.imageNameToSave ++ ".png"): payload }]]]></compression:entries>
             <compression:archiver>
